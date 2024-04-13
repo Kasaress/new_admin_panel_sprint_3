@@ -1,0 +1,57 @@
+version: '3.8'
+volumes:
+  pgdbdata:
+#  static:
+#  media:
+  esdata:
+
+services:
+  pgdb:
+    image: postgres:15
+    env_file:
+      - .env
+    container_name: pgdb
+    volumes:
+      - pgdbdata:/var/lib/postgresql/data/
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+#    ports:
+#      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+
+  etl:
+    container_name: etl
+    build: ./
+    restart: always
+    ports:
+      - 8000:8000
+    env_file:
+      - etl/config/.env
+    depends_on:
+#      elasticsearch:
+#        condition: service_healthy
+      pgdb:
+        condition: service_healthy
+#    volumes:
+#      - static:/app/static/
+#      - media:/app/media/
+    environment:
+      - COMPOSE_BUILD_NO_CACHE=1
+
+
+
+
+
+
+
+
