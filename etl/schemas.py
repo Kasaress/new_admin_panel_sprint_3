@@ -1,20 +1,24 @@
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class PersonSchema(BaseModel):
     id: str
     name: str
-    role: Optional[str] = None
 
 
 class FilmWorkSchema(BaseModel):
     id: str
-    title: str
-    description: Optional[str] = None
-    rating: Optional[float] = None
-    type: str
+    imdb_rating: float | None = Field(alias='rating')
     genres: List[str]
-    persons: List[PersonSchema]
-    extracted_time: datetime
+    title: str
+    description: str | None = None
+    directors_names: str | None = None
+    actors_names: str | None = None
+    writers_names: str | None = None
+    directors: PersonSchema | None = None
+    actors: PersonSchema | None = None
+    writers: PersonSchema | None = None
+
+

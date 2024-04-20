@@ -15,8 +15,8 @@ class DatabaseSettings(BaseSettings):
 
 
 class ElasticsearchSettings(BaseSettings):
-    scheme: str = 'http://'
-    host: str = Field(alias='ES_URL')
+    scheme: str = Field(alias='ES_SCHEMA')
+    host: str = Field(alias='ES_HOST')
     port: int = Field(alias='ES_PORT')
 
     class Config:

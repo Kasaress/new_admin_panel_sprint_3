@@ -24,9 +24,9 @@ class ETLProcess:
         print(len(data))
         # enriched_data = self.enricher.enrich(data)
         # merged_data = self.merger.merge(data, enriched_data)
-        # merged_data = data
-        # transformed_data = self.transformer.transform(merged_data)
-        # print(transformed_data)
-        # print(len(transformed_data))
-        # self.loader.load(transformed_data)
+        merged_data = data
+        transformed_data = self.transformer.transform(merged_data)
+        print(transformed_data)
+        print(len(transformed_data))
+        self.loader.load(transformed_data)
         print('run ETLProcess')
