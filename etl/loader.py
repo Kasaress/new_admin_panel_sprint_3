@@ -13,8 +13,8 @@ class ElasticsearchLoader:
 
     def setup_index(self):
         # Удалить индекс, если он уже существует
-        if self.elastic.indices.exists(index=self.index_name):
-            self.elastic.indices.delete(index=self.index_name)
+        # if self.elastic.indices.exists(index=self.index_name):
+        #     self.elastic.indices.delete(index=self.index_name)
         # Конфигурация индекса
         index_settings = {
             "settings": {
@@ -83,7 +83,6 @@ class ElasticsearchLoader:
                 }
             }
         }
-        # Создание индекса с этими настройками
         self.elastic.indices.create(index=self.index_name, body=index_settings)
 
     def load(self, transformed_data):
