@@ -2,6 +2,7 @@ import json
 from elasticsearch import Elasticsearch, helpers
 
 from etl.config.elastic_index_schema import elastic_index_settings
+from etl.config.logging_settings import logger
 
 
 class ElasticsearchLoader:
@@ -18,4 +19,5 @@ class ElasticsearchLoader:
     def load(self, transformed_data):
         print("Loading data into Elasticsearch...")
         for item in transformed_data:
+            logger.info(f'{item.dict()=}')
             self.elastic.index(index=self.index_name, id=item.id, body=item.dict())

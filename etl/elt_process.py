@@ -1,6 +1,7 @@
 import datetime
 
 from etl.config.config import db_settings, es_settings
+from etl.config.logging_settings import logger
 from etl.extractor import PostgresProducer, PostgresEnricher, PostgresMerger
 from etl.loader import ElasticsearchLoader
 from etl.tramsformer import PostgresToElasticTransformer
@@ -20,13 +21,13 @@ class ETLProcess:
         """
         modified = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
         data = self.producer.produce(modified)
-        print(data)
-        print(len(data))
+        # logger.info(data)
+        # logger.info(len(data))
         # enriched_data = self.enricher.enrich(data)
         # merged_data = self.merger.merge(data, enriched_data)
         merged_data = data
         transformed_data = self.transformer.transform(merged_data)
-        print(transformed_data)
-        print(len(transformed_data))
+        logger.info(transformed_data)
+        # logger.info(len(transformed_data))
         self.loader.load(transformed_data)
-        print('run ETLProcess')
+        logger.info('run ETLProcess')
