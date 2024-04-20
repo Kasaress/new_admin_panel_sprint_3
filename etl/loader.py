@@ -19,5 +19,5 @@ class ElasticsearchLoader:
     def load(self, transformed_data):
         print("Loading data into Elasticsearch...")
         for item in transformed_data:
-            logger.info(f'{item.dict()=}')
+            # logger.info(f'{item.dict()=}')
             self.elastic.index(index=self.index_name, id=item.id, body=item.dict())

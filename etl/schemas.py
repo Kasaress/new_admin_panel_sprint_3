@@ -10,11 +10,6 @@ ROLES = {
 }
 
 
-# class PersonSchema(BaseModel):
-#     id: str
-#     name: str
-
-
 class PersonSchema(BaseModel):
     id: str
     name: str

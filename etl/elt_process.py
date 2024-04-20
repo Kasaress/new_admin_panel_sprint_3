@@ -14,12 +14,16 @@ class ETLProcess:
         self.merger = PostgresMerger()
         self.transformer = PostgresToElasticTransformer()
         self.loader = ElasticsearchLoader(es_settings)
+        self.state = None
 
     def run(self) -> None:
         """
         Выполняет полный ETL процесс.
         """
-        modified = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+        if not self.state:
+            modified = datetime.datetime.utcnow() - datetime.timedelta(weeks=900)
+        else:
+            modified = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
         data = self.producer.produce(modified)
         # logger.info(data)
         # logger.info(len(data))
