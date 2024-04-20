@@ -1,16 +1,21 @@
-from datetime import datetime
-from typing import List, Optional
-from pydantic import BaseModel, Field, model_validator
+from typing import List
+from pydantic import BaseModel, Field
 
 from etl.config.logging_settings import logger
 
+ROLES = {
+    'directors': 'режиссер',
+    'actors': 'актер',
+    'writers': 'сценарист'
+}
+
+
+# class PersonSchema(BaseModel):
+#     id: str
+#     name: str
+
 
 class PersonSchema(BaseModel):
-    id: str
-    name: str
-
-
-class PersonFullSchema(BaseModel):
     id: str
     name: str
     role: str
@@ -21,41 +26,21 @@ class FilmWorkSchema(BaseModel):
     imdb_rating: float | None = Field(alias='rating')
     genres: List[str]
     title: str
-    persons: list[PersonFullSchema] | None = Field(exclude=True)
+    persons: list[PersonSchema] | None = Field(exclude=True)
     description: str | None = None
 
-    @property
-    def directors(self):
-        return [PersonSchema(id=person.id, name=person.name).dict() for person in self.persons if person.role.lower() == 'режиссер']
+    def _filter_persons(self, role: str):
+        return [person for person in self.persons if person.role == role]
 
-    @property
-    def directors_names(self):
-        return [person.name for person in self.persons if person.role.lower() == 'режиссер']
+    def _get_persons_info(self, role: str):
+        return [{'id': person.id, 'name': person.name} for person in self._filter_persons(role)]
 
-    @property
-    def actors(self):
-        return [PersonSchema(id=person.id, name=person.name).dict() for person in self.persons if
-                person.role.lower() == 'актер']
-
-    @property
-    def actors_names(self):
-        return [person.name for person in self.persons if person.role.lower() == 'актер']
-
-    @property
-    def writers(self):
-        return [PersonSchema(id=person.id, name=person.name).dict() for person in self.persons if
-                person.role.lower() == 'сценарист']
-
-    @property
-    def writers_names(self):
-        return [person.name for person in self.persons if person.role.lower() == 'сценарист']
+    def _get_persons_names(self, role: str):
+        return [person.name for person in self._filter_persons(role)]
 
     def dict(self, **kwargs):
         obj_dict = super().dict(**kwargs)
-        obj_dict['directors'] = self.directors
-        obj_dict['directors_names'] = self.directors_names
-        obj_dict['actors'] = self.actors
-        obj_dict['actors_names'] = self.actors_names
-        obj_dict['writers'] = self.writers
-        obj_dict['writers_names'] = self.writers_names
+        for role_key, role_value in ROLES.items():
+            obj_dict[role_key] = self._get_persons_info(role_value)
+            obj_dict[f'{role_key}_names'] = self._get_persons_names(role_value)
         return obj_dict
