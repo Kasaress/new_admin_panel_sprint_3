@@ -3,15 +3,18 @@ from elasticsearch import Elasticsearch, helpers
 
 
 class ElasticsearchLoader:
-    def __init__(self):
-        self.es = Elasticsearch()
+    def __init__(self, es_settings):
+        self.host = es_settings.host
+        self.port = es_settings.port
+        self.scheme = es_settings.scheme
+        self.elastic = Elasticsearch([{'scheme': self.scheme, 'host': self.host, 'port': self.port}])
         self.index_name = "movies"
         self.setup_index()
 
     def setup_index(self):
         # Удалить индекс, если он уже существует
-        if self.es.indices.exists(self.index_name):
-            self.es.indices.delete(index=self.index_name)
+        if self.elastic.indices.exists(index=self.index_name):
+            self.elastic.indices.delete(index=self.index_name)
         # Конфигурация индекса
         index_settings = {
             "settings": {
@@ -81,9 +84,9 @@ class ElasticsearchLoader:
             }
         }
         # Создание индекса с этими настройками
-        self.es.indices.create(index=self.index_name, body=index_settings)
+        self.elastic.indices.create(index=self.index_name, body=index_settings)
 
     def load(self, transformed_data):
         print("Loading data into Elasticsearch...")
         for item in transformed_data:
-            self.es.index(index=self.index_name, id=item['id'], body=item)
+            self.elastic.index(index=self.index_name, id=item['id'], body=item)
