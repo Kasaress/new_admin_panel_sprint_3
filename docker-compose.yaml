@@ -25,7 +25,6 @@ services:
     container_name: admin_movies
     build: ./
     restart: always
-
     env_file:
       - movies_admin/config/.env
     depends_on:
@@ -36,6 +35,11 @@ services:
       - media:/app/media/
     environment:
       - COMPOSE_BUILD_NO_CACHE=1
+    command:
+      - gunicorn
+      - config.wsgi:application
+      - --bind
+      - 0.0.0.0:8000
 
   nginx:
     image: nginx:latest
