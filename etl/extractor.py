@@ -1,7 +1,5 @@
 import psycopg2
 from datetime import datetime
-import psycopg2
-from datetime import datetime
 
 from psycopg2.extras import DictCursor
 
@@ -31,18 +29,3 @@ class PostgresProducer:
             for record in cursor:
                 data.append(dict(record))
         return data
-
-
-class PostgresEnricher:
-    def enrich(self, data):
-        enriched_data = []
-        for item in data:
-            item['extracted_time'] = datetime.now()
-            enriched_data.append(item)
-        return enriched_data
-
-
-class PostgresMerger:
-    def merge(self, data, additional_data):
-        print("Merging data...")
-        return additional_data
