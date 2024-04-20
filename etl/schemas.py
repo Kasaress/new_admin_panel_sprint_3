@@ -25,7 +25,9 @@ class FilmWorkSchema(BaseModel):
     description: str | None = None
 
     def _filter_persons(self, role: str):
-        return [person for person in self.persons if person.role == role]
+        if self.persons is not None:
+            return [person for person in self.persons if person.role == role]
+        return []
 
     def _get_persons_info(self, role: str):
         return [{'id': person.id, 'name': person.name} for person in self._filter_persons(role)]

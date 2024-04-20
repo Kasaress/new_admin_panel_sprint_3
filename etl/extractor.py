@@ -23,6 +23,7 @@ class PostgresProducer:
                 LEFT JOIN content.person_film_work AS pf ON fw.id = pf.film_work_id
                 LEFT JOIN content.person AS p ON pf.person_id = p.id
                 WHERE fw.modified > %s
+                AND p.id IS NOT NULL
                 GROUP BY fw.id
                 ORDER BY fw.modified;
             """, (modified,))

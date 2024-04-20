@@ -8,7 +8,7 @@ class PostgresToElasticTransformer:
         for row in rows_from_postgres_query:
             try:
                 data.append(FilmWorkSchema(**row))
-            except Exception:
-                logger.error('ошибка')
+            except Exception as er:
+                logger.error(f'ошибка {row=}, {er=}')
                 continue
         return data

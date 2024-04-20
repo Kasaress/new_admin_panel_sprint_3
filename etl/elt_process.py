@@ -23,7 +23,7 @@ class ETLProcess:
         if not self.state:
             modified = datetime.datetime.utcnow() - datetime.timedelta(weeks=900)
         else:
-            modified = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+            modified = datetime.datetime.utcnow() - datetime.timedelta(minutes=10)
         data = self.producer.produce(modified)
         # logger.info(data)
         # logger.info(len(data))
@@ -31,7 +31,7 @@ class ETLProcess:
         # merged_data = self.merger.merge(data, enriched_data)
         merged_data = data
         transformed_data = self.transformer.transform(merged_data)
-        logger.info(transformed_data)
+        # logger.info(transformed_data)
         # logger.info(len(transformed_data))
         self.loader.load(transformed_data)
         logger.info('run ETLProcess')
