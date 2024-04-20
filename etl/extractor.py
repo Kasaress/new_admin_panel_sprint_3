@@ -1,16 +1,10 @@
 import psycopg2
 from datetime import datetime
-
-from etl.interfaces import PostgresProducer, PostgresEnricher, PostgresMerger
-
-
-# Вставляем здесь ранее определённые абстрактные классы
-
 import psycopg2
 from datetime import datetime
 
 
-class RealPostgresProducer(PostgresProducer):
+class PostgresProducer:
     def __init__(self, db_settings):
         self.connection = psycopg2.connect(**db_settings)
 
@@ -33,7 +27,7 @@ class RealPostgresProducer(PostgresProducer):
         return data
 
 
-class RealPostgresEnricher(PostgresEnricher):
+class PostgresEnricher:
     def enrich(self, data):
         enriched_data = []
         for item in data:
@@ -42,8 +36,7 @@ class RealPostgresEnricher(PostgresEnricher):
         return enriched_data
 
 
-
-class RealPostgresMerger(PostgresMerger):
+class PostgresMerger:
     def merge(self, data, additional_data):
         print("Merging data...")
         # Простейшее объединение данных; можно расширить логику в соответствии с требованиями

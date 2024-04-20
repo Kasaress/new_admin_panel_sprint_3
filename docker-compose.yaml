@@ -1,8 +1,8 @@
 version: '3.8'
 volumes:
   pgdbdata:
-#  static:
-#  media:
+  static:
+  media:
   esdata:
 
 services:
@@ -13,40 +13,68 @@ services:
     container_name: pgdb
     volumes:
       - pgdbdata:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  admin_movies:
+    container_name: admin_movies
+    build: ./
+    restart: always
+
+    env_file:
+      - movies_admin/config/.env
+    depends_on:
+      pgdb:
+        condition: service_healthy
+    volumes:
+      - static:/app/static/
+      - media:/app/media/
+    environment:
+      - COMPOSE_BUILD_NO_CACHE=1
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - static:/var/static/
+      - media:/var/media/
+    depends_on:
+      - admin_movies
+    ports:
+      - 80:80
+    environment:
+      - COMPOSE_BUILD_NO_CACHE=1
+
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch
+    image: elasticsearch:8.7.1
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-#    ports:
-#      - "9200:9200"
+    ports:
+      - "9200:9200"
     volumes:
       - esdata:/usr/share/elasticsearch/data
-
-  etl:
-    container_name: etl
-    build: ./
-    restart: always
-    ports:
-      - 8000:8000
-    env_file:
-      - etl/config/.env
-    depends_on:
-#      elasticsearch:
+#
+#  etl:
+#    container_name: etl
+#    build: ./
+#    restart: always
+#    ports:
+#      - 8000:8000
+#    env_file:
+#      - etl/config/.env
+#    depends_on:
+##      elasticsearch:
+##        condition: service_healthy
+#      pgdb:
 #        condition: service_healthy
-      pgdb:
-        condition: service_healthy
-#    volumes:
-#      - static:/app/static/
-#      - media:/app/media/
-    environment:
-      - COMPOSE_BUILD_NO_CACHE=1
+#    environment:
+#      - COMPOSE_BUILD_NO_CACHE=1
 
 
 

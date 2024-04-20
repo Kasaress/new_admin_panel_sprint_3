@@ -1,10 +1,8 @@
 import json
 from elasticsearch import Elasticsearch, helpers
 
-from etl.interfaces import Loader
 
-
-class ElasticsearchLoader(Loader):
+class ElasticsearchLoader:
     def __init__(self):
         self.es = Elasticsearch()
         self.index_name = "movies"
@@ -85,9 +83,7 @@ class ElasticsearchLoader(Loader):
         # Создание индекса с этими настройками
         self.es.indices.create(index=self.index_name, body=index_settings)
 
-
     def load(self, transformed_data):
         print("Loading data into Elasticsearch...")
         for item in transformed_data:
-            # Добавление элемента в Elasticsearch; дополнительные настройки могут быть нужны в зависимости от данных
             self.es.index(index=self.index_name, id=item['id'], body=item)

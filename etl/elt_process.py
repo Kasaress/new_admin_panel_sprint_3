@@ -1,23 +1,24 @@
-from etl.interfaces import ETLProcess
+from etl.config.config import db_settings, es_settings
+from etl.extractor import PostgresProducer, PostgresEnricher, PostgresMerger
+from etl.loader import ElasticsearchLoader
+from etl.tramsformer import PostgresToElasticTransformer
 
 
-class PostgresETLProcess(ETLProcess):
-    def __init__(self, producer: PostgresProducer, enricher: PostgresEnricher, merger: PostgresMerger):
-        self.producer = producer
-        self.enricher = enricher
-        self.merger = merger
+class ETLProcess:
+    def __init__(self):
+        self.producer = PostgresProducer(db_settings)
+        self.enricher = PostgresEnricher()
+        self.merger = PostgresMerger()
+        self.transformer = PostgresToElasticTransformer()
+        self.loader = ElasticsearchLoader(es_settings)
 
-    def execute_etl(self):
+    def run(self) -> None:
         """
-        Выполняет полный ETL процесс, используя атрибуты класса.
+        Выполняет полный ETL процесс.
         """
-        # Извлекаем данные
-        data = self.producer.produce()
-
-        # Обогащаем данные
-        enriched_data = self.enricher.enrich(data)
-
-        # Объединяем данные
-        merged_data = self.merger.merge(data, enriched_data)
-
-        return merged_data
+        # data = self.producer.produce()
+        # enriched_data = self.enricher.enrich(data)
+        # merged_data = self.merger.merge(data, enriched_data)
+        # transformed_data = self.transformer.transform(merged_data)
+        # self.loader.load(transformed_data)
+        print('run ETLProcess')
