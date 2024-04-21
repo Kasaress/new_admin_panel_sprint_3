@@ -24,10 +24,10 @@ class PostgresProducer:
                 LEFT JOIN content.genre AS g ON gfw.genre_id = g.id
                 LEFT JOIN content.person_film_work AS pf ON fw.id = pf.film_work_id
                 LEFT JOIN content.person AS p ON pf.person_id = p.id
-                WHERE fw.modified > %s
+                WHERE fw.modified > %s OR g.modified > %s OR p.modified > %s
                 GROUP BY fw.id
                 ORDER BY fw.modified;
-            """, (modified,))
+            """, (modified, modified, modified))
 
             for record in cursor:
                 data.append(dict(record))
