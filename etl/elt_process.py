@@ -4,22 +4,23 @@ from etl.config.config import db_settings, es_settings
 from etl.config.logging_settings import logger
 from etl.extractor import PostgresExtractor
 from etl.loader import ElasticsearchLoader
+from etl.state import State
 from etl.tramsformer import PostgresToElasticTransformer
 
 
 class ETLProcess:
-    def __init__(self):
+    def __init__(self, state: State):
         self.extractor = PostgresExtractor(db_settings)
         self.transformer = PostgresToElasticTransformer()
         self.loader = ElasticsearchLoader(es_settings)
-        self.state = None
+        self.state = state
 
     def run(self) -> None:
         """
         Выполняет полный ETL процесс.
         """
         logger.info('run ETLProcess')
-        if not self.state:
+        if not self.state.get_state():
             modified = None
         else:
             modified = datetime.datetime.utcnow() - datetime.timedelta(minutes=10)

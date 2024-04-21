@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 from apscheduler.executors.pool import ProcessPoolExecutor
 
+from etl.state import State
 
 executors = {
     'default': ProcessPoolExecutor(max_workers=1),
@@ -13,7 +14,8 @@ scheduler = BackgroundScheduler(executors=executors)
 
 
 def start_etl() -> None:
-    etl = ETLProcess()
+    state = State()
+    etl = ETLProcess(state)
     etl.run()
 
 
