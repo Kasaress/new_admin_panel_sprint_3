@@ -3,31 +3,24 @@ from datetime import datetime
 
 from psycopg2.extras import DictCursor
 
+from etl.config.raw_sql import query_by_modified, query_all
 
-class PostgresProducer:
+
+class PostgresExtractor:
     def __init__(self, db_settings):
         self.connection = psycopg2.connect(**db_settings.dict())
+        self.query_by_modified: str = query_by_modified
+        self.query_all: str = query_all
 
-    def produce(self, modified: datetime):
+    def extract(self, modified: datetime | None):
         data = []
         with self.connection.cursor(cursor_factory=DictCursor) as cursor:
-            cursor.execute("""
-                SELECT fw.id, fw.title, fw.description, fw.rating, fw.type,
-                       array_agg(DISTINCT g.name) AS genres,
-                       CASE
-                           WHEN COUNT(pf.person_id) > 0
-                               THEN jsonb_agg(DISTINCT jsonb_build_object('id', p.id, 'name', p.full_name, 'role', pf.role))
-                           ELSE NULL
-                       END AS persons
-                FROM content.film_work AS fw
-                LEFT JOIN content.genre_film_work AS gfw ON fw.id = gfw.film_work_id
-                LEFT JOIN content.genre AS g ON gfw.genre_id = g.id
-                LEFT JOIN content.person_film_work AS pf ON fw.id = pf.film_work_id
-                LEFT JOIN content.person AS p ON pf.person_id = p.id
-                WHERE fw.modified > %s OR g.modified > %s OR p.modified > %s
-                GROUP BY fw.id
-                ORDER BY fw.modified;
-            """, (modified, modified, modified))
+            if modified:
+                cursor.execute(
+                    self.query_by_modified, (modified, modified, modified)
+                )
+            else:
+                cursor.execute(self.query_all)
 
             for record in cursor:
                 data.append(dict(record))

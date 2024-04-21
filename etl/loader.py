@@ -19,12 +19,23 @@ class ElasticsearchLoader:
         Если индекса еще нет - создает его.
         """
         if not self.elastic.indices.exists(index=self.index_name):
-            self.elastic.indices.create(index=self.index_name, body=self.index_settings)
+            self.elastic.indices.create(
+                index=self.index_name,
+                body=self.index_settings
+            )
 
     def load(self, transformed_data):
         """Метод пообъектной загрузки данных."""
         try:
             for item in transformed_data:
-                self.elastic.index(index=self.index_name, id=item.id, body=item.dict())
-        except Exception as error:  # TODO конкретнее и с обработой ошибки конекшна
-            logger.error(f'Ошибка загрузки данных: {error}. Данные: {transformed_data} не были загружены.')
+                self.elastic.index(
+                    index=self.index_name,
+                    id=item.id,
+                    body=item.dict()
+                )
+        except Exception as error:
+            # TODO конкретнее и с обработой ошибки конекшна
+            logger.error(
+                f'Ошибка загрузки данных: {error}. Данные: '
+                f'{transformed_data} не были загружены.'
+            )

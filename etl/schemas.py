@@ -30,7 +30,8 @@ class FilmWorkSchema(BaseModel):
 
     def _get_persons_info(self, role: str):
         return [
-            {'id': person.id, 'name': person.name} for person in self._filter_persons(role)
+            {'id': person.id, 'name': person.name}
+            for person in self._filter_persons(role)
         ]
 
     def _get_persons_names(self, role: str):
