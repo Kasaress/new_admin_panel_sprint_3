@@ -1,12 +1,11 @@
 from typing import List
 from pydantic import BaseModel, Field
 
-from etl.config.logging_settings import logger
 
 ROLES = {
-    'directors': 'режиссер',
-    'actors': 'актер',
-    'writers': 'сценарист'
+    'directors': 'director',
+    'actors': 'actor',
+    'writers': 'writer'
 }
 
 
@@ -30,7 +29,9 @@ class FilmWorkSchema(BaseModel):
         return []
 
     def _get_persons_info(self, role: str):
-        return [{'id': person.id, 'name': person.name} for person in self._filter_persons(role)]
+        return [
+            {'id': person.id, 'name': person.name} for person in self._filter_persons(role)
+        ]
 
     def _get_persons_names(self, role: str):
         return [person.name for person in self._filter_persons(role)]
