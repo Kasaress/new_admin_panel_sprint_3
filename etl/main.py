@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 from apscheduler.executors.pool import ProcessPoolExecutor
 
-from etl.state import State
+from etl.state import State, Storage
 
 executors = {
     'default': ProcessPoolExecutor(max_workers=1),
@@ -14,7 +14,8 @@ scheduler = BackgroundScheduler(executors=executors)
 
 
 def start_etl() -> None:
-    state = State()
+    storage = Storage('modified_storage.txt')
+    state = State(storage)
     etl = ETLProcess(state)
     etl.run()
 
