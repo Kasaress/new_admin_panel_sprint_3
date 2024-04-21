@@ -1,4 +1,4 @@
-from pydantic import Field, Extra
+from pydantic import Extra, Field
 from pydantic_settings import BaseSettings
 
 

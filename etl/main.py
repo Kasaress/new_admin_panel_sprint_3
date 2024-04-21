@@ -1,10 +1,10 @@
+import time
+from datetime import datetime
+
+from apscheduler.executors.pool import ProcessPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 
 from etl.elt_process import ETLProcess
-import time
-from datetime import datetime
-from apscheduler.executors.pool import ProcessPoolExecutor
-
 from etl.state import State, Storage
 
 executors = {

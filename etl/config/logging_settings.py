@@ -1,6 +1,5 @@
 import logging
 
-
 logger = logging.getLogger('etl')
 logging.basicConfig(level=logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')

@@ -12,12 +12,11 @@ class Storage:
             file.write(
                 f"{modified}"
             )
-            logger.info(f'write state {modified}')
+            logger.info(f'write new state {modified}')
 
     def read(self) -> str | None:
         with open(self.file_path, 'r') as file:
             res = file.read()
-            logger.info(f'read state {res}')
         return res
 
 
