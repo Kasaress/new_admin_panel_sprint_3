@@ -29,7 +29,6 @@ class State:
 
     def set_state(self) -> None:
         modified = datetime.datetime.utcnow()
-        modified = modified.strftime("%Y-%m-%d %H:%M:%S.%f+00")
-        self.storage.write(modified)
+        modified_str = modified.strftime("%Y-%m-%d %H:%M:%S.%f+00")
+        self.storage.write(modified_str)
         return None
-

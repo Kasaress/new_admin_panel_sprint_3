@@ -1,4 +1,3 @@
-import json
 import random
 
 import backoff
@@ -6,7 +5,6 @@ import elastic_transport
 from elasticsearch import Elasticsearch
 
 from config.elastic_index_schema import elastic_index_settings
-from config.logging_settings import logger
 from exceptions import ElasticConnectionError
 
 

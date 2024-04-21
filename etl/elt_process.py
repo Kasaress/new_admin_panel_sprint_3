@@ -8,7 +8,8 @@ from tramsformer import PostgresToElasticTransformer
 
 
 class ETLProcess:
-    def __init__(self, state_manager: State):
+    """Менеджер процесса загрузки данных из Postgres в Elastic."""
+    def __init__(self, state_manager: State) -> None:
         self.extractor = PostgresExtractor(db_settings)
         self.transformer = PostgresToElasticTransformer()
         self.loader = ElasticsearchLoader(es_settings)
