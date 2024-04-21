@@ -6,6 +6,4 @@ RUN pip install --upgrade pip
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt --no-cache-dir
 
-COPY ./movies_admin .
-
-RUN python manage.py collectstatic --noinput
+COPY ./etl .

@@ -1,5 +1,5 @@
-from etl.config.logging_settings import logger
-from etl.schemas import FilmWorkSchema
+from config.logging_settings import logger
+from schemas import FilmWorkSchema
 
 
 class PostgresToElasticTransformer:

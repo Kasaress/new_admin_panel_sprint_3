@@ -1,6 +1,6 @@
 import datetime
 
-from etl.config.logging_settings import logger
+from config.logging_settings import logger
 
 
 class Storage:

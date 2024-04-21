@@ -1,10 +1,10 @@
-from etl.config.config import db_settings, es_settings
-from etl.config.logging_settings import logger
-from etl.exceptions import ElasticConnectionError, PostgresConnectionError
-from etl.extractor import PostgresExtractor
-from etl.loader import ElasticsearchLoader
-from etl.state import State
-from etl.tramsformer import PostgresToElasticTransformer
+from config.config import db_settings, es_settings
+from config.logging_settings import logger
+from exceptions import ElasticConnectionError, PostgresConnectionError
+from extractor import PostgresExtractor
+from loader import ElasticsearchLoader
+from state import State
+from tramsformer import PostgresToElasticTransformer
 
 
 class ETLProcess:

@@ -5,8 +5,8 @@ import backoff
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from etl.config.raw_sql import query_all, query_by_modified
-from etl.exceptions import PostgresConnectionError
+from config.raw_sql import query_all, query_by_modified
+from exceptions import PostgresConnectionError
 
 
 class PostgresExtractor:

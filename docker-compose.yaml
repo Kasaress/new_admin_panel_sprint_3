@@ -21,39 +21,6 @@ services:
       timeout: 5s
       retries: 5
 
-  admin_movies:
-    container_name: admin_movies
-    build: ./
-    restart: always
-    env_file:
-      - movies_admin/config/.env
-    depends_on:
-      pgdb:
-        condition: service_healthy
-    volumes:
-      - static:/app/static/
-      - media:/app/media/
-    environment:
-      - COMPOSE_BUILD_NO_CACHE=1
-    command:
-      - gunicorn
-      - config.wsgi:application
-      - --bind
-      - 0.0.0.0:8000
-
-  nginx:
-    image: nginx:latest
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - static:/var/static/
-      - media:/var/media/
-    depends_on:
-      - admin_movies
-    ports:
-      - 80:80
-    environment:
-      - COMPOSE_BUILD_NO_CACHE=1
-
   elasticsearch:
     image: elasticsearch:8.7.1
     container_name: elasticsearch
@@ -64,27 +31,27 @@ services:
       - "9200:9200"
     volumes:
       - esdata:/usr/share/elasticsearch/data
-#
-#  etl:
-#    container_name: etl
-#    build: ./
-#    restart: always
-#    ports:
-#      - 8000:8000
-#    env_file:
-#      - etl/config/.env
-#    depends_on:
-##      elasticsearch:
-##        condition: service_healthy
-#      pgdb:
-#        condition: service_healthy
-#    environment:
-#      - COMPOSE_BUILD_NO_CACHE=1
+    healthcheck:
+      test: curl -s http://elasticsearch:9200 >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
 
-
-
-
-
-
-
-
+  etl:
+    container_name: etl
+    build: ./
+    restart: always
+    ports:
+      - 8000:8000
+    env_file:
+      - .env
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      pgdb:
+        condition: service_healthy
+    environment:
+      - COMPOSE_BUILD_NO_CACHE=1
+    command:
+      - python
+      - main.py
