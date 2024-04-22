@@ -2,7 +2,7 @@ import random
 
 import backoff
 import elastic_transport
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 
 from config.elastic_index_schema import elastic_index_settings
 from exceptions import ElasticConnectionError
@@ -17,7 +17,7 @@ class ElasticsearchLoader:
 
     @backoff.on_exception(
         backoff.expo,
-        elastic_transport.ConnectionTimeout,
+        (elastic_transport.ConnectionError, elastic_transport.ConnectionTimeout),
         max_tries=10,
         max_time=10,
         jitter=lambda: random.uniform(0.2, 1),
@@ -25,6 +25,8 @@ class ElasticsearchLoader:
     def setup_index(self):
         """
         Если индекса еще нет - создает его.
+        Бэкофф отрабатывает ретраи, и если они не помогли,
+        райзит ошибку.
         """
         if not self.elastic.indices.exists(index=self.index_name):
             self.elastic.indices.create(
@@ -34,23 +36,43 @@ class ElasticsearchLoader:
 
     @backoff.on_exception(
         backoff.expo,
-        elastic_transport.ConnectionTimeout,
+        (elastic_transport.ConnectionError, elastic_transport.ConnectionTimeout),
         max_tries=10,
         max_time=10,
         jitter=lambda: random.uniform(0.2, 1),
     )
+    def _bulk_load(self, transformed_data):
+        """
+        Метод загрузки данных в эластик пачкой.
+        Исключение для бэкоффа возникает только если transformed_data не пустая.
+        """
+        bulk_data = []
+        for item in transformed_data:
+            bulk_data.append({
+                '_op_type': 'index',
+                '_index': self.index_name,
+                '_id': item.id,
+                '_source': item.dict()
+            })
+        helpers.bulk(self.elastic, bulk_data)
+
     def load(self, transformed_data):
-        """Метод пообъектной загрузки данных."""
+        """
+        Метод загрузки данных в эластик.
+        Вызывает методы класса с бэкофф. Если ретраи в бэкофф не помогают,
+        ловим соответствующие ошибки и райзим кастомное
+        исключение для обработки в etl.run.
+        Для проверки отработки исключений можно поставить контейнер с эластиком на паузу,
+        изменить поле modified в любом объекте в БД и посмотреть логи.
+        """
         try:
             self.setup_index()
-            for item in transformed_data:
-                self.elastic.index(
-                    index=self.index_name,
-                    id=item.id,
-                    body=item.dict()
-                )
-        except elastic_transport.ConnectionTimeout as error:
+            self._bulk_load(transformed_data)
+        except (elastic_transport.ConnectionError, elastic_transport.ConnectionTimeout) as error:
             raise ElasticConnectionError(
                 f'Ошибка загрузки данных: {error}. Данные: '
                 f'{transformed_data} не были загружены.'
             )
+        finally:
+            if self.elastic:
+                self.elastic.close()
